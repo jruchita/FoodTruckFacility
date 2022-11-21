@@ -3,7 +3,9 @@ package com.ruchita.learningspringboot.client;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.ruchita.learningspringboot.helper.DistanceHelper;
 import com.ruchita.learningspringboot.model.FoodTruck;
+import com.ruchita.learningspringboot.model.Location;
 import org.apache.http.HttpResponse;
 import org.apache.http.NameValuePair;
 import org.apache.http.client.HttpClient;
@@ -19,6 +21,7 @@ import java.io.InputStreamReader;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.*;
+import java.util.stream.Collectors;
 
 @Repository
 public class OpenDataClientImpl implements OpenDataClient {
@@ -51,6 +54,37 @@ public class OpenDataClientImpl implements OpenDataClient {
         }
 
         return getFoodTrucksMappedResponse(response);
+    }
+
+    @Override
+    public List<FoodTruck> getNearestFoodTruck(Location location) {
+      List<FoodTruck> foodTruckList =   getAllFoodTrucks(null);
+      List<FoodTruck> nearestFoodTrucksList = new ArrayList<>();
+      Map<Long, FoodTruck> objectIdFoodTruckMap =  new HashMap<>();
+      Map<Long, Double> objectIdDistanceMap =  new HashMap<>();
+
+        foodTruckList.stream().forEach(item-> objectIdFoodTruckMap.put(item.getObjectId(), item));
+      List<Location> locationList = new ArrayList<>();
+
+      foodTruckList.stream().forEach(item -> locationList.add(item.getLocation()));
+        for (Map.Entry<Long, FoodTruck> entry : objectIdFoodTruckMap.entrySet()) {
+            Long key = entry.getKey();
+            FoodTruck value = entry.getValue();
+            Location locationFoodTruck =  value.getLocation();
+            Double distance = DistanceHelper.distance(location.getLatitude(), location.getLongitude(), locationFoodTruck.getLatitude(), locationFoodTruck.getLongitude());
+            objectIdDistanceMap.put(key, distance);
+        }
+        Double minDistance = Collections.min(objectIdDistanceMap.values());
+        for(Map.Entry<Long, Double> entry: objectIdDistanceMap.entrySet()) {
+            // if give value is equal to value from entry
+            // print the corresponding key
+            if(entry.getValue() == minDistance) {
+                System.out.println("The key for value " + minDistance + " is " + entry.getKey());
+                nearestFoodTrucksList.add(objectIdFoodTruckMap.get(entry.getKey()));
+                break;
+            }
+        }
+        return nearestFoodTrucksList;
     }
 
     private List<NameValuePair> getParameters(String filter) {

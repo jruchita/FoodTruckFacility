@@ -8,19 +8,20 @@ import java.util.UUID;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class FoodTruck {
-    private String objectId;
+    private long objectId;
     private String applicant;
     private Date expirationDate;
     private String locationDescription;
     private String status;
     private String address;
+    private Location location;
 
     @JsonProperty("objectid")
-    public String getObjectId() {
+    public long getObjectId() {
         return objectId;
     }
 
-    public void setObjectId(String objectId) {
+    public void setObjectId(long objectId) {
         this.objectId = objectId;
     }
 
@@ -64,5 +65,13 @@ public class FoodTruck {
 
     public void setAddress(String address) {
         this.address = address;
+    }
+
+    public Location getLocation() {
+        return location;
+    }
+
+    public void setLocation(Location location) {
+        this.location = location;
     }
 }
