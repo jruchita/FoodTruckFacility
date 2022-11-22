@@ -12,5 +12,6 @@ public interface FoodTruckRepository extends JpaRepository<FoodTruckEntity, Long
 
     public List<FoodTruckEntity> getAllFoodTrucks(String filter);
     public FoodTruckEntity getNearestFoodTruck(String location);
+    public void insertFoodTruck(FoodTruckEntity foodTruck);
 
 }

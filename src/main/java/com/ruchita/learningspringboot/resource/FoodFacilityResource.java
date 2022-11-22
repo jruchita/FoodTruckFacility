@@ -45,4 +45,11 @@ public class FoodFacilityResource {
         }
         return ResponseEntity.ok(foodTruck);
     }
+
+    @RequestMapping(method = RequestMethod.PUT,
+            path = "/insertFoodTruck"
+    )
+    public void insertFoodTruck(@RequestBody HashMap<String, String> body ) {
+        foodTruckService.insertFoodTruck(body);
+    }
 }

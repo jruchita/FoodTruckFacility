@@ -13,9 +13,11 @@ import org.springframework.stereotype.Repository;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import javax.persistence.Query;
+import javax.transaction.Transactional;
 import java.util.*;
 import java.util.function.Function;
 
+@Transactional
 public class FoodTruckRepositoryImpl implements  FoodTruckRepository{
     @PersistenceContext
     private EntityManager em;
@@ -64,6 +66,11 @@ public class FoodTruckRepositoryImpl implements  FoodTruckRepository{
             }
         }
         return nearestFoodTruck;
+    }
+
+    @Override
+    public void insertFoodTruck(FoodTruckEntity foodTruck) {
+        em.persist(foodTruck);
     }
 
     @Override

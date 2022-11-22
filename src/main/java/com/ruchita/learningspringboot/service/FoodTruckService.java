@@ -1,6 +1,5 @@
 package com.ruchita.learningspringboot.service;
 
-import com.ruchita.learningspringboot.client.OpenDataClient;
 import com.ruchita.learningspringboot.model.FoodTruckEntity;
 import com.ruchita.learningspringboot.repository.FoodTruckRepository;
 import org.apache.http.NameValuePair;
@@ -9,12 +8,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 @Service
 public class FoodTruckService {
-    private OpenDataClient openDataClient;
-
     @Autowired
     private FoodTruckRepository foodTruckRepository;
 
@@ -29,6 +27,13 @@ public class FoodTruckService {
 
     public FoodTruckEntity getNearestFoodTruck(String location) {
         return foodTruckRepository.getNearestFoodTruck(location);
+    }
+
+    public void insertFoodTruck(HashMap<String, String> body) {
+        FoodTruckEntity foodTruck =  new FoodTruckEntity();
+        foodTruck.setObjectId(Long.valueOf(body.get("objectid")));
+        foodTruck.setApplicant(body.get("applicant"));
+        foodTruckRepository.insertFoodTruck(foodTruck);
     }
     private List<NameValuePair> getParameters(String filter) {
         List<NameValuePair> paramList = new ArrayList<>();
