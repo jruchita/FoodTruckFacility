@@ -3,9 +3,7 @@ package com.ruchita.learningspringboot.client;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.ruchita.learningspringboot.helper.DistanceHelper;
-import com.ruchita.learningspringboot.model.FoodTruck;
-import com.ruchita.learningspringboot.model.Location;
+import com.ruchita.learningspringboot.model.FoodTruckEntity;
 import org.apache.http.HttpResponse;
 import org.apache.http.NameValuePair;
 import org.apache.http.client.HttpClient;
@@ -21,14 +19,13 @@ import java.io.InputStreamReader;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.*;
-import java.util.stream.Collectors;
 
 @Repository
 public class OpenDataClientImpl implements OpenDataClient {
     public static final String URL = "https://data.sfgov.org/resource/rqzj-sfat.json";
 
     @Override
-    public List<FoodTruck> getAllFoodTrucks(String filter) {
+    public List<FoodTruckEntity> getAllFoodTrucks(String filter) {
         HttpClient httpClient =  HttpClientBuilder.create().build();
         HttpGet getRequest = new HttpGet(
                 URL);
@@ -57,22 +54,19 @@ public class OpenDataClientImpl implements OpenDataClient {
     }
 
     @Override
-    public List<FoodTruck> getNearestFoodTruck(Location location) {
-      List<FoodTruck> foodTruckList =   getAllFoodTrucks(null);
-      List<FoodTruck> nearestFoodTrucksList = new ArrayList<>();
-      Map<Long, FoodTruck> objectIdFoodTruckMap =  new HashMap<>();
+    public List<FoodTruckEntity> getNearestFoodTruck(String location) {
+      List<FoodTruckEntity> foodTruckList =   getAllFoodTrucks(null);
+      List<FoodTruckEntity> nearestFoodTrucksList = new ArrayList<>();
+      Map<Long, FoodTruckEntity> objectIdFoodTruckMap =  new HashMap<>();
       Map<Long, Double> objectIdDistanceMap =  new HashMap<>();
 
-        foodTruckList.stream().forEach(item-> objectIdFoodTruckMap.put(item.getObjectId(), item));
-      List<Location> locationList = new ArrayList<>();
-
-      foodTruckList.stream().forEach(item -> locationList.add(item.getLocation()));
-        for (Map.Entry<Long, FoodTruck> entry : objectIdFoodTruckMap.entrySet()) {
+       // foodTruckList.stream().forEach(item-> objectIdFoodTruckMap.put(item.getObjectId(), item));
+        for (Map.Entry<Long, FoodTruckEntity> entry : objectIdFoodTruckMap.entrySet()) {
             Long key = entry.getKey();
-            FoodTruck value = entry.getValue();
-            Location locationFoodTruck =  value.getLocation();
-            Double distance = DistanceHelper.distance(location.getLatitude(), location.getLongitude(), locationFoodTruck.getLatitude(), locationFoodTruck.getLongitude());
-            objectIdDistanceMap.put(key, distance);
+            FoodTruckEntity value = entry.getValue();
+            String locationFoodTruck =  value.getLocation();
+            //Double distance = DistanceHelper.distance(location.getLatitude(), location.getLongitude(), locationFoodTruck.getLatitude(), locationFoodTruck.getLongitude());
+            //objectIdDistanceMap.put(key, distance);
         }
         Double minDistance = Collections.min(objectIdDistanceMap.values());
         for(Map.Entry<Long, Double> entry: objectIdDistanceMap.entrySet()) {
@@ -113,9 +107,9 @@ public class OpenDataClientImpl implements OpenDataClient {
         return paramList;
     }
 
-    private List<FoodTruck> getFoodTrucksMappedResponse(HttpResponse response) {
+    private List<FoodTruckEntity> getFoodTrucksMappedResponse(HttpResponse response) {
         String output = null;
-        List<FoodTruck> mappedResponse = null;
+        List<FoodTruckEntity> mappedResponse = null;
         BufferedReader br = null;
         StringBuilder responseBody = new StringBuilder();
         try {
@@ -130,7 +124,7 @@ public class OpenDataClientImpl implements OpenDataClient {
 
         ObjectMapper jsonMapper = new ObjectMapper();
         try {
-            mappedResponse =  jsonMapper.readValue(responseBody.toString(),new TypeReference<List<FoodTruck>>(){});
+            mappedResponse =  jsonMapper.readValue(responseBody.toString(),new TypeReference<List<FoodTruckEntity>>(){});
             System.out.println(mappedResponse);
         } catch (JsonProcessingException e) {
             e.printStackTrace();
