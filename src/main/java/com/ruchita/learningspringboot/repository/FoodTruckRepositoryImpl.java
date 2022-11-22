@@ -24,14 +24,21 @@ public class FoodTruckRepositoryImpl implements  FoodTruckRepository{
 
     @Override
     public List<FoodTruckEntity> getAllFoodTrucks(String filter) {
-        StringBuilder sb = new StringBuilder("select f from FoodTruckEntity f ");
-        if(filter !=null) {
-            String lhs = filter.split("=")[0];
-            String rhs = filter.split("=")[1];
-            sb.append("where f."+lhs+" = '"+rhs+"'");
+        List<FoodTruckEntity> foodTruckEntityList =  new ArrayList<>();
+        try {
+            StringBuilder sb = new StringBuilder("select f from FoodTruckEntity f ");
+            if (filter != null) {
+                String lhs = filter.split("=")[0];
+                String rhs = filter.split("=")[1];
+                sb.append("where f." + lhs + " = '" + rhs + "'");
+            }
+            Query query = em.createQuery(sb.toString(), FoodTruckEntity.class);
+            foodTruckEntityList = query.getResultList();
+        }catch(Exception e) {
+            System.out.println("Exception occured while inserting food trust record");
+            throw e;
         }
-        Query query = em.createQuery(sb.toString(), FoodTruckEntity.class);
-        return query.getResultList();
+        return foodTruckEntityList;
     }
 
     @Override
@@ -55,6 +62,7 @@ public class FoodTruckRepositoryImpl implements  FoodTruckRepository{
             Double distance = DistanceHelper.distance(latitude, longitude, latitudeFoodTruck, longitudeFoodTruck);
             objectIdDistanceMap.put(key, distance);
         }
+        //Optimize by calculating min in prev loop
         Double minDistance = Collections.min(objectIdDistanceMap.values());
         for(Map.Entry<Long, Double> entry: objectIdDistanceMap.entrySet()) {
             // if give value is equal to value from entry
@@ -70,7 +78,13 @@ public class FoodTruckRepositoryImpl implements  FoodTruckRepository{
 
     @Override
     public void insertFoodTruck(FoodTruckEntity foodTruck) {
-        em.persist(foodTruck);
+      try {
+          em.persist(foodTruck);
+      }
+      catch(Exception e) {
+          System.out.println("Exception occured while inserting food trust record");
+          throw e;
+      }
     }
 
     @Override
